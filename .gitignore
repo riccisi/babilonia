@@ -1,0 +1,18 @@
+# IntelliJ
+.idea/
+*.iml
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+release.properties
+dependency-reduced-pom.xml
+
+# Docker
+pgdata/
+.env
+*.jar
+
+# OS
+.DS_Store

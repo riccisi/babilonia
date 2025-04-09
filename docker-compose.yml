@@ -1,0 +1,52 @@
+version: "3.8"
+
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: babilonia-db
+    restart: always
+    environment:
+      POSTGRES_DB: babilonia
+      POSTGRES_USER: babilonia
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - babilonia-net
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.3
+    container_name: babilonia-keycloak
+    command: start-dev
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8080:8080"
+    networks:
+      - babilonia-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: babilonia-backend
+    depends_on:
+      - postgres
+      - keycloak
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/babilonia
+      SPRING_DATASOURCE_USERNAME: babilonia
+      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8081:8081"
+    networks:
+      - babilonia-net
+
+volumes:
+  pgdata:
+
+networks:
+  babilonia-net:
