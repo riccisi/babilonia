@@ -20,6 +20,12 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8080/realms/babilonia
+          jwk-set-uri: http://localhost:8080/realms/babilonia/protocol/openid-connect/certs
 
 server:
   port: 8081
+
+logging:
+  level:
+    root: INFO
+    org.springframework.security: DEBUG
