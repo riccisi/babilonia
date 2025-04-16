@@ -11,12 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
-public class UserController {
-    private final UserService userService;
+public class UserDataController {
+
+    private final UserDataService userDataService;
 
     @GetMapping("/me")
-    public ResponseEntity<User> getUser(@AuthenticationPrincipal Jwt jwt) {
-        final User user = this.userService.syncFromJwt(jwt);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<UserData> getUser(@AuthenticationPrincipal Jwt jwt) {
+        final UserData userData = this.userDataService.syncFromJwt(jwt);
+        return ResponseEntity.ok(userData);
     }
 }

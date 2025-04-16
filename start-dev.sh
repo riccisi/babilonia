@@ -1,9 +1,7 @@
 #!/bin/bash
-
-# Costruisce il jar Spring Boot
-cd backend || exit
-./mvnw clean package -DskipTests
+echo "▶️ Compilazione del backend..."
+cd backend || exit 1
+./mvnw clean install -DskipTests || { echo "❌ Compilazione fallita"; exit 1; }
 cd ..
-
-# Avvia tutto tramite docker compose
+echo "🐳 Avvio dei container: PostgreSQL + Keycloak..."
 docker compose up --build

@@ -1,36 +1,38 @@
 package it.riccisi.babilonia.token;
 
-import it.riccisi.babilonia.user.User;
+import it.riccisi.babilonia.user.UserData;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.UUID;
 
-@RequiredArgsConstructor
+@Entity
+@NoArgsConstructor
 @Getter
 public final class ApiToken {
 
     @Id @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    private UUID id;
     @Column(unique = true, nullable = false)
     private String token;
     @ManyToOne(optional = false)
-    private User user;
+    private UserData userData;
     private String label;
     private String foundryInstanceId; // stabile per installazione Foundry
     private Instant createdAt;
     private boolean revoked;
 
-    public ApiToken(String token, User user, String label) {
+    public ApiToken(String token, UserData userData, String label) {
         this.token = token;
-        this.user = user;
+        this.userData = userData;
         this.label = label;
         this.createdAt = Instant.now();
     }
 
-    public boolean belongsTo(User user) {
-        return this.user.equals(user);
+    public boolean belongsTo(UserData userData) {
+        return this.userData.equals(userData);
     }
 
     public void revoke() {

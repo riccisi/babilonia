@@ -7,7 +7,8 @@ import java.time.Instant;
 
 @Entity
 @NoArgsConstructor
-public class User {
+public class UserData {
+
     @Id @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     @Column(unique = true, nullable = false)
@@ -19,7 +20,7 @@ public class User {
     private boolean notificationsEnabled;
     private Instant createdAt;
 
-    public User(String externalId, String email, String displayName) {
+    public UserData(String externalId, String email, String displayName) {
         this.externalId = externalId;
         this.email = email;
         this.displayName = displayName;

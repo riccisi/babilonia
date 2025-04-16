@@ -1,52 +1,70 @@
-version: "3.8"
 
-services:
+ services:
 
-  postgres:
-    image: postgres:16
-    container_name: babilonia-db
-    restart: always
-    environment:
-      POSTGRES_DB: babilonia
-      POSTGRES_USER: babilonia
-      POSTGRES_PASSWORD: secret
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    networks:
-      - babilonia-net
+   postgres:
+     image: postgres:16
+     container_name: babilonia-db
+     restart: always
+     environment:
+       POSTGRES_DB: babilonia
+       POSTGRES_USER: babilonia
+       POSTGRES_PASSWORD: secret
+     ports:
+       - "5432:5432"
+     volumes:
+       - pgdata:/var/lib/postgresql/data
+       - ./keycloak/init.sql:/docker-entrypoint-initdb.d/init.sql
+     networks:
+       - babilonia-net
 
-  keycloak:
-    image: quay.io/keycloak/keycloak:24.0.3
-    container_name: babilonia-keycloak
-    command: start-dev
-    environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-    ports:
-      - "8080:8080"
-    networks:
-      - babilonia-net
+   keycloak:
+     image: quay.io/keycloak/keycloak:24.0
+     container_name: babilonia-keycloak
+     command: start-dev --import-realm
+     depends_on:
+       - postgres
+     environment:
+       - KEYCLOAK_ADMIN=admin
+       - KEYCLOAK_ADMIN_PASSWORD=admin
+       - KC_DB=postgres
+       - KC_DB_URL_HOST=postgres
+       - KC_DB_URL_PORT=5432
+       - KC_DB_SCHEMA=public
+       - KC_DB_USERNAME=babilonia
+       - KC_DB_PASSWORD=secret
+       - KC_REALM_IMPORT=/opt/keycloak/data/import/realm-export.json
+     volumes:
+       - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
+       - keycloak_data:/opt/keycloak/data
+       - ./keycloak/themes:/opt/keycloak/themes
+     ports:
+       - "8080:8080"
+     networks:
+       - babilonia-net
 
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: babilonia-backend
-    depends_on:
-      - postgres
-      - keycloak
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/babilonia
-      SPRING_DATASOURCE_USERNAME: babilonia
-      SPRING_DATASOURCE_PASSWORD: secret
-      SPRING_PROFILES_ACTIVE: docker
-    ports:
-      - "8081:8081"
-    networks:
-      - babilonia-net
+   backend:
+     build:
+       context: ./backend
+       dockerfile: Dockerfile
+     container_name: babilonia-backend
+     depends_on:
+       - postgres
+       - keycloak
+     environment:
+       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/babilonia
+       SPRING_DATASOURCE_USERNAME: babilonia
+       SPRING_DATASOURCE_PASSWORD: secret
+       SPRING_PROFILES_ACTIVE: docker
+     ports:
+       - "8081:8081"
+     networks:
+       - babilonia-net
 
-volumes:
-  pgdata:
+ volumes:
+   pgdata:
+   keycloak_data:
 
-networks:
-  babilonia-net:
+ networks:
+   babilonia-net:
+   keycloak_data:
+   postgres_data:
