@@ -1,0 +1,57 @@
+{
+  "ADVENTURE": {
+    "name": "name",
+    "description": "description",
+    "caption": "caption",
+    "folders": "folders",
+    "journals": "journal",
+    "scenes": "scenes",
+    "macros": "macros",
+    "playlists": "playlists",
+    "tables": "tables",
+    "items": "items",
+    "actors": "actors",
+    "cards": "cards"
+  },
+  "ACTOR": {
+    "name": "name",
+    "description": "system.details.biography.value",
+    "items": "items",
+    "tokenName": "prototypeToken.name"
+  },
+  "CARDS": {
+    "name": "name",
+    "description": "description",
+    "cards": "cards"
+  },
+  "FOLDER": {
+  },
+  "ITEM": {
+    "name": "name",
+    "description": "system.description.value"
+  },
+  "JOURNAL_ENTRY": {
+    "name": "name",
+    "description": "content",
+    "pages": "pages"
+  },
+  "MACRO": {
+    "name": "name",
+    "command": "command"
+  },
+  "PLAYLIST": {
+    "name": "name",
+    "description": "description",
+    "sounds": "sounds"
+  },
+  "ROLL_TABLE": {
+    "name": "name",
+    "description": "description",
+    "results": "results"
+  },
+  "SCENE": {
+    "name": "name",
+    "drawings": "drawings",
+    "notes": "notes"
+  }
+}

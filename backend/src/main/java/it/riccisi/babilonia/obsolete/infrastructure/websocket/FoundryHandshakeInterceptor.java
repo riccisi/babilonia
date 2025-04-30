@@ -1,0 +1,57 @@
+package it.riccisi.babilonia.obsolete.infrastructure.websocket;
+
+import it.riccisi.babilonia.domain.FoundryConnection;
+import it.riccisi.babilonia.domain.FoundryConnections;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.server.HandshakeInterceptor;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
+import java.util.Map;
+
+@RequiredArgsConstructor
+public final class FoundryHandshakeInterceptor implements HandshakeInterceptor {
+
+    @NonNull private final FoundryConnections connections;
+
+    @Override
+    public boolean beforeHandshake(
+        ServerHttpRequest request,
+        ServerHttpResponse response,
+        WebSocketHandler wsHandler,
+        Map<String, Object> attributes) {
+
+        final URI uri = request.getURI();
+        final MultiValueMap<String, String> params = UriComponentsBuilder.fromUri(uri).build().getQueryParams();
+        final String token      = params.getFirst("token");
+        final String instanceId = params.getFirst("instanceId");
+
+        final FoundryConnection conn = this.connections
+            .getByInstanceId(instanceId)
+            .orElseThrow(() -> new IllegalArgumentException("No connection found"));
+
+        if(!conn.checkToken(token)) {
+            response.setStatusCode(HttpStatus.FORBIDDEN);
+            return false;
+        }
+
+        attributes.put("authorized", true);
+        attributes.put("instanceId", instanceId);
+        return true;
+    }
+
+    @Override
+    public void afterHandshake(
+        ServerHttpRequest request,
+        ServerHttpResponse response,
+        WebSocketHandler wsHandler,
+        Exception exception) {
+        // do nothing
+    }
+}
