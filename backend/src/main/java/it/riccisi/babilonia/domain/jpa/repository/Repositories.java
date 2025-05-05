@@ -8,8 +8,6 @@ public interface Repositories {
     ProjectRepository projects();
     UserRepository users();
     ProjectMembershipRepository projectMemberships();
-
     ProjectMappingsRepository projectMappings();
-
-    FoundryConnectionRepository foundryConnections();
+    FoundryConnectionRepository connections();
 }

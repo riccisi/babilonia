@@ -1,8 +1,12 @@
 package it.riccisi.babilonia.domain.jpa;
 
+import it.riccisi.babilonia.domain.FoundryConnection;
 import it.riccisi.babilonia.domain.Member;
 import it.riccisi.babilonia.domain.Project;
 import it.riccisi.babilonia.domain.User;
+import it.riccisi.babilonia.domain.exception.NoUserConnectionFound;
+import it.riccisi.babilonia.domain.exception.TooManyConnectionsException;
+import it.riccisi.babilonia.domain.jpa.entity.FoundryConnectionEntity;
 import it.riccisi.babilonia.domain.jpa.entity.ProjectMembershipEntity;
 import it.riccisi.babilonia.domain.jpa.entity.UserEntity;
 import it.riccisi.babilonia.domain.jpa.repository.*;
@@ -13,17 +17,17 @@ import org.cactoos.iterable.Mapped;
 @RequiredArgsConstructor
 public class JpaUser implements User {
 
-    @NonNull private final UserEntity user;
+    @NonNull private final UserEntity entity;
     @NonNull private final Repositories repo;
 
     @Override
     public String id() {
-        return this.user.getId();
+        return this.entity.getId();
     }
 
     @Override
     public String username() {
-        return this.user.getDisplayName();
+        return this.entity.getDisplayName();
     }
 
     @Override
@@ -45,6 +49,44 @@ public class JpaUser implements User {
                 this.repo
             ),
             this.repo.projectMemberships().findByUserId(this.id())
+        );
+    }
+
+    @Override
+    public Iterable<FoundryConnection> connections() {
+        return new Mapped<>(
+            entity -> new JpaFoundryConnection(entity, repo),
+            this.repo.connections().findByOwner(this.entity)
+        );
+    }
+
+    @Override
+    public FoundryConnection connectionByInstanceId(String name) {
+        return new JpaFoundryConnection(
+            this.repo.connections()
+                .findByOwnerAndInstanceId(this.entity, name)
+                .orElseThrow(() -> new NoUserConnectionFound(this.entity.getDisplayName(), name)),
+            this.repo
+        );
+    }
+
+    @Override
+    public FoundryConnection connectionBySecret(String secret) {
+        return new JpaFoundryConnection(
+            this.repo.connections()
+                .findByOwnerAndSecret(this.entity, secret)
+                .orElseThrow(() -> new NoUserConnectionFound(this.entity.getDisplayName(), secret)),
+            this.repo
+        );
+    }
+
+    @Override
+    public FoundryConnection addConnection(String name) {
+        return new JpaFoundryConnection(
+            this.repo.connections().save(
+                new FoundryConnectionEntity(name, this.entity)
+            ),
+            this.repo
         );
     }
 }

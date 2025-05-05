@@ -1,7 +1,7 @@
 package it.riccisi.babilonia.infrastructure.websocket;
 
 import it.riccisi.babilonia.domain.FoundryConnection;
-import it.riccisi.babilonia.domain.FoundryConnections;
+import it.riccisi.babilonia.domain.Users;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,7 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public final class CheckTokenHandshakeInterceptor implements HandshakeInterceptor {
 
-    @NonNull private final FoundryConnections connections;
+    @NonNull private final Users users;
 
     @Override
     public boolean beforeHandshake(
@@ -31,13 +31,11 @@ public final class CheckTokenHandshakeInterceptor implements HandshakeIntercepto
 
         final URI uri = request.getURI();
         final MultiValueMap<String, String> params = UriComponentsBuilder.fromUri(uri).build().getQueryParams();
+        final String userId      = params.getFirst("userId");
         final String token      = params.getFirst("token");
         final String instanceId = params.getFirst("instanceId");
 
-        final FoundryConnection conn = this.connections
-            .getByInstanceId(instanceId)
-            .orElseThrow(() -> new IllegalArgumentException("No connection found"));
-
+        final FoundryConnection conn = this.users.getById(userId).connectionByInstanceId(instanceId);
         if(!conn.checkToken(token)) {
             response.setStatusCode(HttpStatus.FORBIDDEN);
             return false;

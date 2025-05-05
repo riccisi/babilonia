@@ -57,7 +57,7 @@ public final class SpringRepositories implements Repositories {
     }
 
     @Override
-    public FoundryConnectionRepository foundryConnections() {
+    public FoundryConnectionRepository connections() {
         return this.foundryConnectionRepository;
     }
 }

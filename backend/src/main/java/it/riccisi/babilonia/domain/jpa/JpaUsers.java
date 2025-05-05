@@ -21,14 +21,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public final class JpaUsers implements Users {
 
-    @NonNull final UserRepository userRepo;
     @NonNull private final Repositories repo;
 
     @Override
     public User getCurrent(Jwt jwt) {
         final String externalId = jwt.getSubject();
-        final UserEntity entity = this.userRepo.findByExternalId(externalId).orElseGet(
-            () -> this.userRepo.save(
+        final UserEntity entity = this.repo.users().findByExternalId(externalId).orElseGet(
+            () -> this.repo.users().save(
                 new UserEntity(
                     externalId,
                     jwt.getClaimAsString("email"),
@@ -43,13 +42,15 @@ public final class JpaUsers implements Users {
     public @NonNull Iterator<User> iterator() {
         return new Mapped<>(
             this::mapToJpaUser,
-            this.userRepo.findAll().iterator()
+            this.repo.users().findAll().iterator()
         );
     }
 
     @Override
-    public Optional<User> get(String id) {
-        return this.userRepo.findById(id).map(this::mapToJpaUser);
+    public User getById(String id) {
+        return this.mapToJpaUser(
+            this.repo.users().findById(id).orElseThrow()
+        );
     }
 
     private JpaUser mapToJpaUser(UserEntity entity) {

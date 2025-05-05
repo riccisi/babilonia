@@ -44,9 +44,7 @@ public class CompendiumController {
         @PathVariable String projectId,
         @RequestBody List<String> keys) {
 
-        final Project project = this.projects.getById(projectId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
+        final Project project = this.projects.getById(projectId);
         if(!user.asMemberOf(project).canManageCompendium()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
@@ -95,9 +93,7 @@ public class CompendiumController {
         @CurrentUser User me,
         @PathVariable String projectId
     ) {
-        final Project project = this.projects.getById(projectId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
+        final Project project = this.projects.getById(projectId);
         if(!me.asMemberOf(project).canRead()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }

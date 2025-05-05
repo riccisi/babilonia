@@ -3,6 +3,7 @@ package it.riccisi.babilonia.domain.jpa;
 import it.riccisi.babilonia.domain.Project;
 import it.riccisi.babilonia.domain.ProjectStatus;
 import it.riccisi.babilonia.domain.Projects;
+import it.riccisi.babilonia.domain.exception.NoProjectFoundException;
 import it.riccisi.babilonia.domain.jpa.entity.ProjectEntity;
 import it.riccisi.babilonia.domain.jpa.repository.*;
 import lombok.NonNull;
@@ -11,7 +12,6 @@ import org.cactoos.iterator.Mapped;
 import org.springframework.stereotype.Service;
 
 import java.util.Iterator;
-import java.util.Optional;
 
 @Service("projects")
 @RequiredArgsConstructor
@@ -34,8 +34,12 @@ public final class JpaProjects implements Projects {
     }
 
     @Override
-    public Optional<Project> getById(String id) {
-        return this.projectRepo.findById(id).map(this::mapToJpaProject);
+    public Project getById(String id) throws NoProjectFoundException {
+        return this.mapToJpaProject(
+            this.projectRepo
+            .findById(id)
+            .orElseThrow(() -> new NoProjectFoundException(id))
+        );
     }
 
     @Override

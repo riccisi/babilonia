@@ -6,7 +6,6 @@ import it.riccisi.babilonia.domain.exception.AlreadyPairedException;
 import it.riccisi.babilonia.domain.exception.InvalidPairingException;
 import it.riccisi.babilonia.domain.jpa.entity.FoundryConnectionEntity;
 
-import it.riccisi.babilonia.domain.jpa.repository.FoundryConnectionRepository;
 import it.riccisi.babilonia.domain.jpa.repository.Repositories;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -63,12 +62,12 @@ public class JpaFoundryConnection implements FoundryConnection {
 
     @Override
     public void save() {
-        this.repo.foundryConnections().save(this.entity);
+        this.repo.connections().save(this.entity);
     }
 
     @Override
     public void delete() {
-        this.repo.foundryConnections().delete(this.entity);
+        this.repo.connections().delete(this.entity);
     }
 
     @Override

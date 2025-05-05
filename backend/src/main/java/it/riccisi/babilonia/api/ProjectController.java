@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 
 /**
@@ -19,7 +18,8 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("/api/projects")
 @RequiredArgsConstructor
-public class ProjectController {
+public class
+ProjectController {
 
     @NonNull private final Projects projects;
 
@@ -45,10 +45,8 @@ public class ProjectController {
         @RequestParam String system,
         @RequestParam String world
     ) {
-
         final Project project = this.projects.create(name, description, instanceId, system, world);
         project.addMember(me, ProjectRole.OWNER);
-
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(project.id());
     }
 
@@ -57,9 +55,7 @@ public class ProjectController {
      */
     @GetMapping("/{id}/status")
     public ResponseEntity<ProjectStatusResponse> getStatus(@PathVariable String id) {
-        final Project project = this.projects.getById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
+        final Project project = this.projects.getById(id);
         return ResponseEntity.ok(new ProjectStatusResponse(project.status(), project.progress()));
     }
 

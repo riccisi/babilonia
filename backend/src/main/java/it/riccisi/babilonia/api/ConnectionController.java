@@ -1,10 +1,10 @@
 package it.riccisi.babilonia.api;
 
 import it.riccisi.babilonia.domain.FoundryConnection;
-import it.riccisi.babilonia.domain.FoundryConnections;
+import it.riccisi.babilonia.domain.User;
 import it.riccisi.babilonia.domain.exception.AlreadyPairedException;
 import it.riccisi.babilonia.domain.exception.InvalidPairingException;
-import it.riccisi.babilonia.domain.jpa.JpaFoundryConnection;
+import it.riccisi.babilonia.infrastructure.security.CurrentUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -17,14 +17,14 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("/api/connections")
 @RequiredArgsConstructor
-public class FoundryConnectionController {
-
-    private final FoundryConnections connections;
+public class ConnectionController {
 
     @PostMapping("/pair")
-    public ResponseEntity<Void> pair(@RequestBody PairRequest req) {
-        FoundryConnection conn = this.connections.getBySecret(req.secret())
-            .orElseThrow(() -> new ResponseStatusException(HttpStatusCode.valueOf(404), "Connessione non trovata"));
+    public ResponseEntity<Void> pair(
+        @CurrentUser User user,
+        @RequestBody PairRequest req) {
+
+        final FoundryConnection conn = user.connectionBySecret(req.secret());
         try {
             conn.confirmPairing(req.secret(), req.instanceId());
             conn.save();
